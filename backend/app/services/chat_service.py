@@ -1,5 +1,7 @@
 import logging
 
+from fastapi import HTTPException
+
 from app.schemas.chat import ChatResponse
 from app.services.conversation_service import ConversationService
 from app.services.llm_service import LLMService
@@ -31,18 +33,27 @@ class ChatService:
         history = self._conversations.get_recent_messages(conversation.id)
         previous_citations = self._conversations.get_last_citations(conversation.id)
 
+        news_fetch_failed = False
+
         if is_follow_up(message, has_history=bool(history)) and previous_citations:
             citations = previous_citations
             logger.info("Treating message as a follow-up; reusing %d prior citations", len(citations))
         else:
             news_request = build_news_request(message)
-            news_response = await self._news_service.search(news_request)
-            citations = build_citations(news_response.articles)
+            try:
+                news_response = await self._news_service.search(news_request)
+                citations = build_citations(news_response.articles)
+            except HTTPException as exc:
+                logger.warning("News retrieval failed; falling back to a graceful reply: %s", exc.detail)
+                citations = []
+                news_fetch_failed = True
 
         llm_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
         for past in history:
             llm_messages.append({"role": past.role, "content": past.content})
-        llm_messages.append({"role": "user", "content": build_user_prompt(message, citations)})
+        llm_messages.append(
+            {"role": "user", "content": build_user_prompt(message, citations, fetch_failed=news_fetch_failed)}
+        )
 
         reply = await self._llm_service.complete(llm_messages)
 

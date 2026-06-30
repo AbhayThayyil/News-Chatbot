@@ -22,7 +22,15 @@ class _Headline(Protocol):
     source: str
 
 
-def build_user_prompt(user_message: str, articles: list[_Headline]) -> str:
+def build_user_prompt(user_message: str, articles: list[_Headline], fetch_failed: bool = False) -> str:
+    if fetch_failed:
+        return (
+            f"User question: {user_message}\n\n"
+            "News retrieval failed for this request. Apologize briefly, explain "
+            "you couldn't access current news right now, and suggest trying "
+            "again shortly. Do not guess or invent any news."
+        )
+
     if not articles:
         return f"User question: {user_message}\n\nNo relevant headlines were found."
 
