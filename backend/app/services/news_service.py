@@ -7,22 +7,33 @@ import httpx
 from fastapi import HTTPException
 
 from app.schemas.news import NewsArticle, NewsSearchRequest, NewsSearchResponse
+from app.utils.cache import TTLCache
 from app.utils.query_parser import build_feed_url
 from app.utils.retry import is_retryable_http_error, retry_async
 
 logger = logging.getLogger("app")
 
 REQUEST_TIMEOUT_SECONDS = 10.0
+FEED_CACHE_TTL_SECONDS = 300.0
 
 
 class NewsService:
     """Fetches and normalizes articles from Google News RSS."""
 
+    def __init__(self) -> None:
+        self._feed_cache: TTLCache[str] = TTLCache(ttl_seconds=FEED_CACHE_TTL_SECONDS)
+
     async def search(self, request: NewsSearchRequest) -> NewsSearchResponse:
         feed_url = build_feed_url(request)
-        logger.info("Fetching news feed: %s", feed_url)
 
-        xml_text = await self._fetch_feed(feed_url)
+        xml_text = self._feed_cache.get(feed_url)
+        if xml_text is not None:
+            logger.info("Using cached news feed: %s", feed_url)
+        else:
+            logger.info("Fetching news feed: %s", feed_url)
+            xml_text = await self._fetch_feed(feed_url)
+            self._feed_cache.set(feed_url, xml_text)
+
         articles = self._parse_feed(xml_text)
         articles = self._deduplicate(articles)
         articles.sort(key=lambda article: article.published_at, reverse=True)
