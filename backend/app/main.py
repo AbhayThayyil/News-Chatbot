@@ -3,8 +3,11 @@ import time
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
+from app.api.chat import router as chat_router
 from app.api.health import router as health_router
+from app.api.news import router as news_router
 from app.core.config import settings
 from app.core.logging_config import configure_logging
 
@@ -41,3 +44,11 @@ async def log_requests(request: Request, call_next):
 
 
 app.include_router(health_router)
+app.include_router(chat_router)
+app.include_router(news_router)
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    logger.error("Unhandled error on %s %s: %s", request.method, request.url.path, exc)
+    return JSONResponse(status_code=500, content={"detail": "Internal server error"})
