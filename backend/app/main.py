@@ -6,13 +6,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.chat import router as chat_router
+from app.api.conversations import router as conversations_router
 from app.api.health import router as health_router
 from app.api.news import router as news_router
 from app.core.config import settings
+from app.core.database import Base, engine
 from app.core.logging_config import configure_logging
+from app.models import Conversation, Message  # noqa: F401 — registers models before create_all
 
 configure_logging()
 logger = logging.getLogger("app")
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=settings.app_name)
 
@@ -46,6 +51,7 @@ async def log_requests(request: Request, call_next):
 app.include_router(health_router)
 app.include_router(chat_router)
 app.include_router(news_router)
+app.include_router(conversations_router)
 
 
 @app.exception_handler(Exception)

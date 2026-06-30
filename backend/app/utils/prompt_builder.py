@@ -1,7 +1,10 @@
-from app.schemas.news import NewsArticle
+from typing import Protocol
 
 SYSTEM_PROMPT = (
-    "You are a news assistant. Summarize ONLY the headlines provided below — "
+    "You are a news assistant having an ongoing conversation. Earlier turns "
+    "may be included for context — use them to understand follow-up questions "
+    "like 'tell me more' or 'compare the first and third'. "
+    "Summarize ONLY the headlines provided in the current turn — "
     "never invent facts, details, or numbers that aren't in them. "
     "Write a short, conversational summary as a numbered list (3-5 items), "
     "one sentence per story, in plain markdown. "
@@ -12,7 +15,12 @@ SYSTEM_PROMPT = (
 )
 
 
-def build_user_prompt(user_message: str, articles: list[NewsArticle]) -> str:
+class _Headline(Protocol):
+    title: str
+    source: str
+
+
+def build_user_prompt(user_message: str, articles: list[_Headline]) -> str:
     if not articles:
         return f"User question: {user_message}\n\nNo relevant headlines were found."
 
