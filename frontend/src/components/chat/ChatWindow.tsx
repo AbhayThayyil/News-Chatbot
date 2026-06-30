@@ -1,15 +1,23 @@
 import { Box } from "@mui/material";
-import { useChat } from "../../hooks/useChat";
+import { forwardRef } from "react";
+import type { useChat } from "../../hooks/useChat";
 import { MessageList } from "./MessageList";
-import { PromptInput } from "./PromptInput";
+import { PromptInput, type PromptInputHandle } from "./PromptInput";
 
-export function ChatWindow() {
-  const { messages, isLoading, sendMessage } = useChat();
+interface ChatWindowProps {
+  chat: ReturnType<typeof useChat>;
+}
+
+export const ChatWindow = forwardRef<PromptInputHandle, ChatWindowProps>(function ChatWindow(
+  { chat },
+  inputRef
+) {
+  const { messages, isLoading, sendMessage } = chat;
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <MessageList messages={messages} isLoading={isLoading} onSuggestedPrompt={sendMessage} />
-      <PromptInput onSend={sendMessage} disabled={isLoading} />
+      <PromptInput ref={inputRef} onSend={sendMessage} disabled={isLoading} />
     </Box>
   );
-}
+});

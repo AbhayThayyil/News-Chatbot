@@ -12,9 +12,11 @@ const MOCK_CONVERSATIONS: Conversation[] = [
 
 interface AppShellProps {
   children: React.ReactNode;
+  onClearChat: () => void;
+  canClearChat: boolean;
 }
 
-export function AppShell({ children }: AppShellProps) {
+export function AppShell({ children, onClearChat, canClearChat }: AppShellProps) {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -36,7 +38,12 @@ export function AppShell({ children }: AppShellProps) {
           minWidth: 0,
         }}
       >
-        <Header onMenuClick={() => setMobileOpen(true)} showMenuButton={!isDesktop} />
+        <Header
+          onMenuClick={() => setMobileOpen(true)}
+          showMenuButton={!isDesktop}
+          onClearChat={onClearChat}
+          canClearChat={canClearChat}
+        />
         <Box sx={{ flex: 1, minHeight: 0 }}>{children}</Box>
       </Box>
     </Box>

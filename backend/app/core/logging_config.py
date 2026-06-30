@@ -23,3 +23,9 @@ def configure_logging() -> None:
     root = logging.getLogger()
     root.setLevel(settings.log_level)
     root.handlers = [handler]
+
+    if settings.is_production:
+        # Our own "Fetching news feed" / "Request completed" logs already cover
+        # what's happening; httpx's per-call line is redundant noise in prod.
+        logging.getLogger("httpx").setLevel(logging.WARNING)
+        logging.getLogger("httpcore").setLevel(logging.WARNING)

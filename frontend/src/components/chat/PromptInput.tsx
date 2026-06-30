@@ -1,14 +1,34 @@
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import { Box, IconButton, TextField } from "@mui/material";
-import { useState, type KeyboardEvent } from "react";
+import {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from "react";
+
+export interface PromptInputHandle {
+  focus: () => void;
+  clear: () => void;
+}
 
 interface PromptInputProps {
   onSend: (text: string) => void;
   disabled: boolean;
 }
 
-export function PromptInput({ onSend, disabled }: PromptInputProps) {
+export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(function PromptInput(
+  { onSend, disabled },
+  ref
+) {
   const [value, setValue] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus(),
+    clear: () => setValue(""),
+  }));
 
   function handleSend() {
     if (!value.trim() || disabled) return;
@@ -20,6 +40,10 @@ export function PromptInput({ onSend, disabled }: PromptInputProps) {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       handleSend();
+      return;
+    }
+    if (event.key === "Escape") {
+      setValue("");
     }
   }
 
@@ -48,10 +72,11 @@ export function PromptInput({ onSend, disabled }: PromptInputProps) {
         }}
       >
         <TextField
+          inputRef={inputRef}
           value={value}
           onChange={(event) => setValue(event.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask about today's news..."
+          placeholder="Ask about today's news... (Esc to clear, Ctrl+/ to focus)"
           multiline
           maxRows={6}
           fullWidth
@@ -71,4 +96,4 @@ export function PromptInput({ onSend, disabled }: PromptInputProps) {
       </Box>
     </Box>
   );
-}
+});

@@ -1,5 +1,5 @@
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
-import { Avatar, Box, Paper } from "@mui/material";
+import { Avatar, Box, Fade, Paper } from "@mui/material";
 
 const dotSx = {
   width: 6,
@@ -15,26 +15,28 @@ const dotSx = {
 
 export function TypingIndicator() {
   return (
-    <Box sx={{ display: "flex", gap: 1.5, alignItems: "flex-start" }}>
-      <Avatar sx={{ width: 32, height: 32, bgcolor: "grey.700" }}>
-        <SmartToyOutlinedIcon fontSize="small" />
-      </Avatar>
-      <Paper
-        elevation={0}
-        sx={{
-          px: 2,
-          py: 1.5,
-          bgcolor: "grey.100",
-          borderRadius: 2,
-          borderTopLeftRadius: 4,
-          display: "flex",
-          gap: 0.6,
-        }}
-      >
-        <Box sx={{ ...dotSx, animationDelay: "0s" }} />
-        <Box sx={{ ...dotSx, animationDelay: "0.15s" }} />
-        <Box sx={{ ...dotSx, animationDelay: "0.3s" }} />
-      </Paper>
-    </Box>
+    <Fade in appear timeout={200}>
+      <Box sx={{ display: "flex", gap: 1.5, alignItems: "flex-start" }}>
+        <Avatar sx={{ width: 32, height: 32, bgcolor: "grey.700" }}>
+          <SmartToyOutlinedIcon fontSize="small" />
+        </Avatar>
+        <Paper
+          elevation={0}
+          sx={{
+            px: 2,
+            py: 1.5,
+            bgcolor: (theme) => (theme.palette.mode === "dark" ? "grey.800" : "grey.100"),
+            borderRadius: 2,
+            borderTopLeftRadius: 4,
+            display: "flex",
+            gap: 0.6,
+          }}
+        >
+          <Box sx={{ ...dotSx, animationDelay: "0s" }} />
+          <Box sx={{ ...dotSx, animationDelay: "0.15s" }} />
+          <Box sx={{ ...dotSx, animationDelay: "0.3s" }} />
+        </Paper>
+      </Box>
+    </Fade>
   );
 }

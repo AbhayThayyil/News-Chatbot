@@ -1,6 +1,9 @@
-import { Avatar, Box, Paper, Typography } from "@mui/material";
+import { Avatar, Box, Fade, IconButton, Paper, Tooltip, Typography } from "@mui/material";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutlined";
+import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
+import CheckIcon from "@mui/icons-material/Check";
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import type { ChatMessage } from "../../types/chat";
 import { SourceList } from "./SourceList";
@@ -11,61 +14,84 @@ interface MessageBubbleProps {
 
 export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === "user";
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    await navigator.clipboard.writeText(message.content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: isUser ? "row-reverse" : "row",
-        gap: 1.5,
-        alignItems: "flex-start",
-      }}
-    >
-      <Avatar
+    <Fade in appear timeout={250}>
+      <Box
         sx={{
-          width: 32,
-          height: 32,
-          bgcolor: isUser ? "primary.main" : "grey.700",
+          display: "flex",
+          flexDirection: isUser ? "row-reverse" : "row",
+          gap: 1.5,
+          alignItems: "flex-start",
         }}
       >
-        {isUser ? <PersonOutlineIcon fontSize="small" /> : <SmartToyOutlinedIcon fontSize="small" />}
-      </Avatar>
-      <Paper
-        elevation={0}
-        sx={{
-          maxWidth: { xs: "90%", sm: "78%" },
-          px: 2,
-          py: 1.25,
-          bgcolor: isUser ? "primary.main" : "grey.100",
-          color: isUser ? "primary.contrastText" : "text.primary",
-          borderRadius: 2,
-          ...(isUser ? { borderTopRightRadius: 4 } : { borderTopLeftRadius: 4 }),
-        }}
-      >
-        {isUser ? (
-          <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
-            {message.content}
-          </Typography>
-        ) : (
-          <Box
+        <Avatar
+          sx={{
+            width: 32,
+            height: 32,
+            bgcolor: isUser ? "primary.main" : "grey.700",
+          }}
+        >
+          {isUser ? <PersonOutlineIcon fontSize="small" /> : <SmartToyOutlinedIcon fontSize="small" />}
+        </Avatar>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, maxWidth: { xs: "90%", sm: "78%" } }}>
+          <Paper
+            elevation={0}
             sx={{
-              fontSize: 14,
-              "& p": { m: 0, mb: 1 },
-              "& p:last-child": { mb: 0 },
-              "& ul, & ol": { m: 0, mb: 1, pl: 2.5 },
-              "& code": {
-                bgcolor: "grey.200",
-                px: 0.5,
-                borderRadius: 0.5,
-                fontSize: 13,
-              },
+              px: 2,
+              py: 1.25,
+              bgcolor: isUser
+                ? "primary.main"
+                : (theme) => (theme.palette.mode === "dark" ? "grey.800" : "grey.100"),
+              color: isUser ? "primary.contrastText" : "text.primary",
+              borderRadius: 2,
+              ...(isUser ? { borderTopRightRadius: 4 } : { borderTopLeftRadius: 4 }),
             }}
           >
-            <ReactMarkdown>{message.content}</ReactMarkdown>
-            {message.citations && <SourceList citations={message.citations} />}
-          </Box>
-        )}
-      </Paper>
-    </Box>
+            {isUser ? (
+              <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+                {message.content}
+              </Typography>
+            ) : (
+              <Box
+                sx={{
+                  fontSize: 14,
+                  "& p": { m: 0, mb: 1 },
+                  "& p:last-child": { mb: 0 },
+                  "& ul, & ol": { m: 0, mb: 1, pl: 2.5 },
+                  "& code": {
+                    bgcolor: (theme) => (theme.palette.mode === "dark" ? "grey.900" : "grey.200"),
+                    px: 0.5,
+                    borderRadius: 0.5,
+                    fontSize: 13,
+                  },
+                }}
+              >
+                <ReactMarkdown>{message.content}</ReactMarkdown>
+                {message.citations && <SourceList citations={message.citations} />}
+              </Box>
+            )}
+          </Paper>
+          {!isUser && (
+            <Tooltip title={copied ? "Copied" : "Copy response"}>
+              <IconButton size="small" onClick={handleCopy} sx={{ alignSelf: "flex-start", ml: 0.5 }}>
+                {copied ? (
+                  <CheckIcon fontSize="inherit" color="success" />
+                ) : (
+                  <ContentCopyOutlinedIcon fontSize="inherit" />
+                )}
+              </IconButton>
+            </Tooltip>
+          )}
+        </Box>
+      </Box>
+    </Fade>
   );
 }
