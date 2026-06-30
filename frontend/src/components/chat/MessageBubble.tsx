@@ -3,6 +3,7 @@ import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutlined";
 import ReactMarkdown from "react-markdown";
 import type { ChatMessage } from "../../types/chat";
+import { SourceList } from "./SourceList";
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -32,7 +33,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       <Paper
         elevation={0}
         sx={{
-          maxWidth: { xs: "85%", sm: "70%" },
+          maxWidth: { xs: "90%", sm: "78%" },
           px: 2,
           py: 1.25,
           bgcolor: isUser ? "primary.main" : "grey.100",
@@ -61,6 +62,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             }}
           >
             <ReactMarkdown>{message.content}</ReactMarkdown>
+            {message.citations && <SourceList citations={message.citations} />}
           </Box>
         )}
       </Paper>

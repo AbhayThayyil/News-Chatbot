@@ -1,16 +1,21 @@
 import { useMutation } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { useRef, useState } from "react";
-import { sendChatMessage } from "../api/chat";
+import { sendChatMessage, type Citation } from "../api/chat";
 import { useToast } from "../components/common/ToastProvider";
 import type { ChatMessage } from "../types/chat";
 
-function createMessage(role: ChatMessage["role"], content: string): ChatMessage {
+function createMessage(
+  role: ChatMessage["role"],
+  content: string,
+  citations?: Citation[]
+): ChatMessage {
   return {
     id: crypto.randomUUID(),
     role,
     content,
     createdAt: Date.now(),
+    citations,
   };
 }
 
@@ -34,7 +39,7 @@ export function useChat() {
     retry: 1,
     onSuccess: (data) => {
       conversationIdRef.current = data.conversation_id;
-      setMessages((prev) => [...prev, createMessage("assistant", data.reply)]);
+      setMessages((prev) => [...prev, createMessage("assistant", data.reply, data.citations)]);
     },
     onError: (error, text) => {
       showToast({
