@@ -14,16 +14,13 @@ REQUEST_TIMEOUT_SECONDS = 20.0
 class LLMService:
     """Calls the Groq chat completions API to generate summaries."""
 
-    async def complete(self, system_prompt: str, user_prompt: str) -> str:
+    async def complete(self, messages: list[dict[str, str]]) -> str:
         if not settings.groq_api_key:
             raise HTTPException(status_code=500, detail="LLM provider is not configured")
 
         payload = {
             "model": settings.groq_model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
+            "messages": messages,
             "temperature": 0.3,
             "max_tokens": 600,
         }
