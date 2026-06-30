@@ -8,7 +8,7 @@ router = APIRouter(tags=["news"])
 
 
 @router.post("/news/search", response_model=NewsSearchResponse)
-def search_news(
+async def search_news(
     request: NewsSearchRequest, news_service: NewsService = Depends(get_news_service)
 ) -> NewsSearchResponse:
-    return news_service.search(request.query, request.max_results)
+    return await news_service.search(request)
