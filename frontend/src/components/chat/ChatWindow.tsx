@@ -1,10 +1,10 @@
 import { Box } from "@mui/material";
-import { useMockChat } from "../../hooks/useMockChat";
+import { useChat } from "../../hooks/useChat";
 import { MessageList } from "./MessageList";
 import { PromptInput } from "./PromptInput";
 
 export function ChatWindow() {
-  const { messages, isLoading, sendMessage } = useMockChat();
+  const { messages, isLoading, sendMessage } = useChat();
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
