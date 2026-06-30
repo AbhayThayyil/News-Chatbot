@@ -8,5 +8,7 @@ router = APIRouter(tags=["chat"])
 
 
 @router.post("/chat", response_model=ChatResponse)
-def chat(request: ChatRequest, chat_service: ChatService = Depends(get_chat_service)) -> ChatResponse:
-    return chat_service.generate_reply(request.message, request.conversation_id)
+async def chat(
+    request: ChatRequest, chat_service: ChatService = Depends(get_chat_service)
+) -> ChatResponse:
+    return await chat_service.generate_reply(request.message, request.conversation_id)
