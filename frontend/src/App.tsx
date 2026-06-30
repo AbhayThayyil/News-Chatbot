@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { HomePage } from "./pages/HomePage";
 import { ChatPage } from "./pages/ChatPage";
+import { ToastProvider } from "./components/common/ToastProvider";
 
 const queryClient = new QueryClient();
 const theme = createTheme({
@@ -16,12 +17,14 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<ChatPage />} />
-            <Route path="/status" element={<HomePage />} />
-          </Routes>
-        </BrowserRouter>
+        <ToastProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<ChatPage />} />
+              <Route path="/status" element={<HomePage />} />
+            </Routes>
+          </BrowserRouter>
+        </ToastProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );
