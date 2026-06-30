@@ -5,6 +5,8 @@ class Citation(BaseModel):
     title: str
     url: str
     source: str
+    published_at: str
+    confidence: float = Field(ge=0.0, le=1.0)
 
 
 class ChatRequest(BaseModel):

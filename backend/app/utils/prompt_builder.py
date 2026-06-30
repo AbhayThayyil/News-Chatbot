@@ -8,8 +8,10 @@ SYSTEM_PROMPT = (
     "never invent facts, details, or numbers that aren't in them. "
     "Write a short, conversational summary as a numbered list (3-5 items), "
     "one sentence per story, in plain markdown. "
-    "After the list, add a line starting with 'Sources:' listing the "
-    "publication name for each story in the same order, comma-separated. "
+    "Cite the headline each sentence is based on with a bracketed number "
+    "right after it, like [1] or [2], matching the headline's number below. "
+    "Do not add a separate 'Sources' section — the bracketed numbers are "
+    "the only citation needed, since sources are shown separately. "
     "If the headlines don't relate to the user's question, say so honestly "
     "instead of guessing."
 )

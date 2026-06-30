@@ -4,6 +4,8 @@ export interface Citation {
   title: string;
   url: string;
   source: string;
+  published_at: string;
+  confidence: number;
 }
 
 export interface ChatRequest {
